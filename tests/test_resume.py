@@ -29,8 +29,9 @@ def write_session(folder: Path, sid: str, turns, mtime: float):
 class ResumeTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.config = Path(self.tmp.name) / "config"
-        self.project = Path(self.tmp.name) / "my-app"
+        base = Path(self.tmp.name).resolve()  # macOS: /var is a symlink to /private/var
+        self.config = base / "config"
+        self.project = base / "my-app"
         self.project.mkdir()
         self.pdir = self.config / "projects" / resume.encode_cwd(str(self.project))
         self.pdir.mkdir(parents=True)

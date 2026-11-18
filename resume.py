@@ -56,8 +56,10 @@ def find_project_dir(cwd: str) -> Path:
     root = projects_root()
     enc = encode_cwd(cwd)
     exact = root / enc
-    if exact.is_dir():
-        return exact
+    # A symlinked folder (e.g. macOS /var -> /private/var) can be recorded under either form.
+    for candidate in (enc, encode_cwd(os.path.realpath(cwd))):
+        if (root / candidate).is_dir():
+            return root / candidate
     if not root.is_dir():
         raise SystemExit(f"No Claude Code transcripts found: {root} does not exist.")
     # Fallback: case-insensitive match, then longest-prefix match.
